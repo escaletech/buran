@@ -6,6 +6,7 @@ require (
 	github.com/gorilla/mux v1.7.0
 	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17
 	github.com/jtolds/gls v4.2.1+incompatible // indirect
+	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/pkg/errors v0.8.1
 	github.com/rdumont/loki v0.0.0-20180711110410-646a506ec94a
 	github.com/sirupsen/logrus v1.3.0

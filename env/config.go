@@ -1,36 +1,17 @@
 package env
 
 import (
-	"fmt"
-	"os"
+	"github.com/kelseyhightower/envconfig"
 )
 
-func GetConfig() Config {
-	return Config{
-		Port:       envWithFallback("PORT", "3000"),
-		BackendURL: require("BACKEND_URL"),
-		RedisURL:   envWithFallback("REDIS_URL", "redis://localhost"),
-	}
-}
-
 type Config struct {
-	Port       string
-	BackendURL string
-	RedisURL   string
+	Port       string `default:"3000"`
+	BackendURL string `required:"true" split_words:"true"`
+	RedisURL   string `default:"redis://localhost" split_words:"true"`
 }
 
-func envWithFallback(key, fallback string) string {
-	if fromEnv := os.Getenv(key); fromEnv != "" {
-		return fromEnv
-	}
-
-	return fallback
-}
-
-func require(key string) string {
-	if fromEnv := os.Getenv(key); fromEnv != "" {
-		return fromEnv
-	}
-
-	panic(fmt.Sprintf("Required environment variable %v is not set", key))
+func GetConfig() Config {
+	var c Config
+	envconfig.MustProcess("", &c)
+	return c
 }
