@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"net/http/httputil"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -33,21 +32,10 @@ func main() {
 	router.Handle("/_webhook", webhookHandler)
 	router.Path("/api/v2").Handler(proxies.Root)
 	router.PathPrefix("/api/v2/documents").Handler(proxies.Documents)
-	router.NewRoute().Handler(proxyTo("escale-health.prismic.io"))
+	router.NewRoute().Handler(proxy.Direct(config.BackendURL))
 
 	log.Info("listening on port ", config.Port)
 	if err := http.ListenAndServe(":"+config.Port, router); err != nil {
 		log.WithError(err).Error("server quit")
 	}
-}
-
-func proxyTo(host string) *httputil.ReverseProxy {
-	director := func(req *http.Request) {
-		req.Header.Set("X-Forwarded-Host", req.Host)
-
-		req.Host = host
-		req.URL.Host = req.Host
-		req.URL.Scheme = "http"
-	}
-	return &httputil.ReverseProxy{Director: director}
 }
