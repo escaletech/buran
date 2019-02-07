@@ -1,0 +1,45 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: 'go test -v ./...'
+      - run: 'make build'
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths: [ '/go/pkg/mod' ]
+      - run: 'mkdir -p /tmp/workspace && mv dist /tmp/workspace'
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths: [ dist ]
+
+  deploy:
+    docker:
+      - image: circleci/node
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: 'mv /tmp/workspace/dist .'
+      - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+      - run: ./docker-deploy.sh
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*/
