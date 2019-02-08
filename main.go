@@ -30,8 +30,8 @@ func main() {
 	router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	router.Use(logger.NewMiddleware())
 	router.Handle("/_webhook", webhookHandler)
-	router.Path("/api/v2").Handler(proxies.Root)
-	router.PathPrefix("/api/v2/documents").Handler(proxies.Documents)
+	router.Path("/api/v2").HandlerFunc(proxies.ServeRoot)
+	router.PathPrefix("/api/v2/documents").HandlerFunc(proxies.ServeDocuments)
 	router.NewRoute().Handler(proxy.Direct(config.BackendURL))
 
 	log.Info("listening on port ", config.Port)

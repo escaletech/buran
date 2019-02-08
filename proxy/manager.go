@@ -21,24 +21,37 @@ func NewManager(config env.Config) (*ProxyManager, error) {
 }
 
 type ProxyManager struct {
-	Root      http.Handler
-	Documents http.Handler
+	rootHandler      http.Handler
+	documentsHandler http.Handler
 
 	redis redigo.Conn
 }
 
+func (h *ProxyManager) ServeRoot(w http.ResponseWriter, r *http.Request) {
+	h.rootHandler.ServeHTTP(w, r)
+}
+
+func (h *ProxyManager) ServeDocuments(w http.ResponseWriter, r *http.Request) {
+	h.documentsHandler.ServeHTTP(w, r)
+}
+
 func (h *ProxyManager) init(config env.Config) {
 	h.redis = redis.Get()
-	h.Root = newRootHandler(config.BackendURL, h.redis)
-	h.Documents = newDocumentsHandler(config.BackendURL, h.redis)
+	h.rootHandler = newRootHandler(config.BackendURL, h.redis)
+	h.documentsHandler = newDocumentsHandler(config.BackendURL, h.redis)
 }
 
 func (h *ProxyManager) startReconnection(config env.Config) {
+	disconnected := false
 	for {
 		time.Sleep(2 * time.Second)
 		if _, err := h.redis.Do("PING"); err != nil {
+			disconnected = true
 			log.WithError(err).Warn("redis connection error, retrying...")
 			h.init(config)
+		} else if disconnected {
+			log.Info("redis connection restored!")
+			disconnected = false
 		}
 	}
 }
