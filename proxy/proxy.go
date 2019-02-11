@@ -8,9 +8,13 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/escaleseo/prismic-proxy-cache/logger"
 )
 
 const HostParamKey = "proxy-host"
+
+var log = logger.Get()
 
 var rootHeaderBlacklist = map[string]struct{}{
 	"Cache-Control":   struct{}{},

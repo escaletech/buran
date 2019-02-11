@@ -2,30 +2,22 @@ package webhook
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"reflect"
 
-	"github.com/escaleseo/prismic-proxy-cache/env"
+	"github.com/escaleseo/prismic-proxy-cache/cache"
 	"github.com/escaleseo/prismic-proxy-cache/logger"
-	"github.com/escaleseo/prismic-proxy-cache/proxy"
-	"github.com/escaleseo/prismic-proxy-cache/redis"
 )
 
 var log = logger.Get()
 
-func New(config env.Config) http.Handler {
-	return &webhookHandler{
-		cacheKey:   fmt.Sprintf("rediscache:%v/api/v2?%v=*", config.BackendURL, proxy.HostParamKey),
-		invalidate: invalidateAPI,
-		getRedis:   func() redisCommander { return redis.Get() },
-	}
+type invalidator func() error
+
+func New(cache cache.Provider) http.Handler {
+	return &webhookHandler{cache.Invalidate}
 }
 
 type webhookHandler struct {
-	cacheKey   string
-	invalidate invalidate
-	getRedis   func() redisCommander
+	invalidate invalidator
 }
 
 func (h *webhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +36,7 @@ func (h *webhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.invalidate(h.getRedis(), h.cacheKey); err != nil {
+	if err := h.invalidate(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -52,27 +44,3 @@ func (h *webhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("ok"))
 }
-
-func invalidateAPI(redis redisCommander, keyPrefix string) error {
-	res, err := redis.Do("KEYS", keyPrefix)
-	if err != nil {
-		return err
-	}
-
-	keys, ok := res.([]interface{})
-	if !ok {
-		return fmt.Errorf("unexpected type %v for keys response", reflect.TypeOf(res))
-	}
-
-	if len(keys) > 0 {
-		_, err = redis.Do("DEL", keys...)
-	}
-
-	return err
-}
-
-type redisCommander interface {
-	Do(command string, args ...interface{}) (reply interface{}, err error)
-}
-
-type invalidate func(redis redisCommander, keyPrefix string) error
