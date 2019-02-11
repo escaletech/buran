@@ -5,9 +5,10 @@ import (
 )
 
 type Config struct {
-	Port       string `default:"3000"`
-	BackendURL string `required:"true" split_words:"true"`
-	RedisURL   string `default:"redis://localhost" split_words:"true"`
+	Port          string `default:"3000"`
+	BackendURL    string `required:"true" split_words:"true"`
+	RedisURL      string `default:"redis://localhost" split_words:"true"`
+	CacheProvider string `default:"redis" split_words:"true"`
 }
 
 func GetConfig() Config {
