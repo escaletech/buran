@@ -11,7 +11,7 @@ Use the following environment variables to configure the server:
 * `PORT` (default: `3000`) - Port on which the application will listen
 * `BACKEND_URL` (*required*, ex: `http://your-repo.cdn.prismic.io`) - URL of your Prismic API backend
 * `REDIS_URL` (default: `redis://localhost`) - Redis connection URL, if you choose to use Redis as a cache
-* `CACHE_PROVIDER` (default: `redis`, values: `redis`, `memory`) - which cache provider implementation to use
+* `CACHE_PROVIDER` (default: `memory`, values: `redis`, `memory`) - which cache provider implementation to use
 
 ### Running in Kubernetes
 
@@ -24,7 +24,6 @@ The [Docker image](https://hub.docker.com/r/escaletech/buran/tags) used in the K
 ```sh
 $ docker run --name prismic \
     --env BACKEND_URL='http://<your-repo>.cdn.prismic.io' \
-    --env CACHE_PROVIDER='memory' \
     -p 3000:3000 escaletech/buran
 ```
 
@@ -41,9 +40,7 @@ $ docker run --name prismic \
 After cloning the project, run:
 
 ```sh
-$ BACKEND_URL='http://<your-repo>.cdn.prismic.io' \
-    CACHE_PROVIDER='memory' \
-    make
+$ BACKEND_URL='http://<your-repo>.cdn.prismic.io' make
 ```
 
 And you should see:
