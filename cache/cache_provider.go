@@ -1,9 +1,9 @@
 package cache
 
 import (
-	"github.com/escaleseo/prismic-proxy-cache/cache/memory"
-	"github.com/escaleseo/prismic-proxy-cache/cache/redis"
-	"github.com/escaleseo/prismic-proxy-cache/env"
+	"github.com/escaleseo/buran/cache/memory"
+	"github.com/escaleseo/buran/cache/redis"
+	"github.com/escaleseo/buran/env"
 	"github.com/gregjones/httpcache"
 	"github.com/pkg/errors"
 )

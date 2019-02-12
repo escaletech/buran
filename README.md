@@ -1,6 +1,6 @@
-# Prismic Proxy Cache
+# Buran 🚀
 
-A proxy for Prismic.io's CDN that caches results for optimal performance.
+Lightning-fast proxy cache for Prismic Headless API CMS
 
 ## Getting started
 
@@ -19,13 +19,13 @@ This proxy was built with Kubernetes in mind, so check out the [Kubernetes examp
 
 ### Running with Docker
 
-The [Docker image](https://hub.docker.com/r/escaletech/prismic-proxy-cache/tags) used in the Kubernetes example is available for you to use in any way you choose:
+The [Docker image](https://hub.docker.com/r/escaletech/buran/tags) used in the Kubernetes example is available for you to use in any way you choose:
 
 ```sh
 $ docker run --name prismic \
-    --env BACKEND_URL='http://my-repo.cdn.prismic.io' \
+    --env BACKEND_URL='http://<your-repo>.cdn.prismic.io' \
     --env CACHE_PROVIDER='memory' \
-    -p 3000:3000 escaletech/prismic-proxy-cache
+    -p 3000:3000 escaletech/buran
 ```
 
 

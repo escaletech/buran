@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: prismic
-        image: escaletech/prismic-proxy-cache:0.1
+        image: escaletech/buran:0.1
         ports:
         - containerPort: 3000
         env:

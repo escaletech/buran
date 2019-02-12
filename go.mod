@@ -1,4 +1,4 @@
-module github.com/escaleseo/prismic-proxy-cache
+module github.com/escaleseo/buran
 
 require (
 	github.com/gomodule/redigo v2.0.0+incompatible

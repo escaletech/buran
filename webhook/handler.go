@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/escaleseo/prismic-proxy-cache/cache"
-	"github.com/escaleseo/prismic-proxy-cache/logger"
+	"github.com/escaleseo/buran/cache"
+	"github.com/escaleseo/buran/logger"
 )
 
 var log = logger.Get()

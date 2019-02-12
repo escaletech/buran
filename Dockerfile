@@ -2,6 +2,6 @@ FROM alpine
 
 WORKDIR /app
 
-COPY ./dist/prismic-proxy /app
+COPY ./dist/buran /app
 
-CMD ["/app/prismic-proxy"]
+CMD ["/app/buran"]

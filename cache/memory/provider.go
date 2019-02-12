@@ -5,7 +5,7 @@ import (
 
 	"github.com/gregjones/httpcache"
 
-	"github.com/escaleseo/prismic-proxy-cache/proxy"
+	"github.com/escaleseo/buran/proxy"
 )
 
 func New() (*MemoryCacheProvider, error) {

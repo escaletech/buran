@@ -6,11 +6,11 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
-	"github.com/escaleseo/prismic-proxy-cache/cache"
-	"github.com/escaleseo/prismic-proxy-cache/env"
-	"github.com/escaleseo/prismic-proxy-cache/logger"
-	"github.com/escaleseo/prismic-proxy-cache/proxy"
-	"github.com/escaleseo/prismic-proxy-cache/webhook"
+	"github.com/escaleseo/buran/cache"
+	"github.com/escaleseo/buran/env"
+	"github.com/escaleseo/buran/logger"
+	"github.com/escaleseo/buran/proxy"
+	"github.com/escaleseo/buran/webhook"
 )
 
 func main() {

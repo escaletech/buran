@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/escaleseo/prismic-proxy-cache/proxy"
+	"github.com/escaleseo/buran/proxy"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/gregjones/httpcache"
 
-	"github.com/escaleseo/prismic-proxy-cache/env"
+	"github.com/escaleseo/buran/env"
 )
 
 type redisCommander interface {

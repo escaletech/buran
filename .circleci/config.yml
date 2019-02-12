@@ -28,7 +28,7 @@ jobs:
           at: /tmp/workspace
       - run: 'mv /tmp/workspace/dist .'
       - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-      - run: ./docker_deploy.sh escaletech/prismic-proxy-cache
+      - run: ./docker_deploy.sh escaletech/buran
 
 workflows:
   version: 2

@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/escaleseo/prismic-proxy-cache/logger"
+	"github.com/escaleseo/buran/logger"
 )
 
 const HostParamKey = "proxy-host"

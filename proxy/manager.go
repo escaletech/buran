@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/escaleseo/prismic-proxy-cache/env"
+	"github.com/escaleseo/buran/env"
 	"github.com/gregjones/httpcache"
 )
 

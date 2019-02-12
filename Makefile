@@ -10,7 +10,7 @@ build:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
 		go build -v \
 		-ldflags "-X main.CommitSha=${CIRCLE_SHA1}" \
-		-o ./dist/prismic-proxy \
+		-o ./dist/buran \
 		./
 
 test:
