@@ -2,6 +2,70 @@
 
 Lightning-fast proxy cache for Prismic Headless API CMS
 
+## Table of contents
+
+- [Buran 🚀](#buran-%F0%9F%9A%80)
+  - [Table of contents](#table-of-contents)
+  - [Why Buran](#why-buran)
+    - [The problem](#the-problem)
+    - [Benchmark](#benchmark)
+    - [Solution](#solution)
+  - [Getting started](#getting-started)
+    - [Configuration](#configuration)
+    - [Running in Kubernetes](#running-in-kubernetes)
+    - [Running with Docker](#running-with-docker)
+  - [Development](#development)
+    - [Requirements](#requirements)
+    - [Running](#running)
+  - [Contributing](#contributing)
+
+## Why Buran
+
+### The problem
+
+Prismic is an amazing Headless CMS, with features such as **experiments**, **previews** and **planned releases**. To do so, it uses a versioning model apparently very inspired by how Git works.
+
+For instance, retrieving a document usually consists of two steps:
+
+```sh
+# 1. Look for the master reference
+ref=`curl http://your-repo.cdn.prismic.io/api/v2 | jq -r '.refs[] | select(.isMasterRef == true) | .ref'`
+
+# 2. Query documents based on reference
+curl -g "http://your-repo.cdn.prismic.io/api/v2/documents/search?ref=$ref&q=[[at(document.type, \"home_page\")]]"
+```
+
+There are two problems here:
+1. The first request is never cached by CDN, so requests originating far from Prismic servers are hurt by latency
+2. CDNs are fast, but local cache is faster
+
+
+### Benchmark
+
+Sample measurements from running the script above from different locations (times in milliseconds):
+
+| avg      | min   | max     |                                                                   |
+| -------- | ----- | ------- | ----------------------------------------------------------------- |
+| **10.8** |   8   |  **30** | Call **proxy** from inside Kubernetes **cluster**                 |
+|   20.7   |  16   |    34   | Call **proxy** from GCP instance in **southamerica-east-1**       |
+|   46.3   | **6** |   223   | Call **Prismic CDN** from AWS instance in **us-east-1**           |
+|   86.2   |  20   |   329   | Call **Prismic CDN** from GCP instance in **southamerica-east-1** |
+
+**Note**: the Redis instance used for cache has low network performance, so its latency could also
+be improved.
+
+**Running the benchmark**
+1. Run `npm install axios`
+2. Edit `configs` in `benchmark.js` to point to the desired endpoints
+3. Run `node benchmark.js <target>`, where `<target>` is one of `prismic`, `buran-remote` or `buran-local`
+
+
+### Solution
+
+Buran solves the latency problem by adding a cache layer (with Redis in the example). The first
+call (to get the master reference) has its cache invalidated whenever content is published, exempting the need to invalidate each query.
+
+
 ## Getting started
 
 ### Configuration
