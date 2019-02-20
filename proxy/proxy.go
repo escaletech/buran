@@ -100,9 +100,11 @@ func newRequestBuilder(backendURL string, isAPIRoot bool) requestBuilder {
 }
 
 func hostVariationParam(r *http.Request) string {
-	proto := r.Header.Get("X-Forwarded-Proto")
-	if proto == "" {
-		proto = "http"
+	proto := "http"
+	for _, k := range r.Header["X-Forwarded-Proto"] {
+		if k == "https" {
+			proto = k
+		}
 	}
 	return fmt.Sprintf("?%v=%v", HostParamKey, url.QueryEscape(proto+"://"+r.Host))
 }

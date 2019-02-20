@@ -144,6 +144,16 @@ func TestProxy(t *testing.T) {
 				So(req.URL.String(), ShouldEqual, "http://target.com/some/prefix/forward-this?proxy-host=https%3A%2F%2Fmysite.com")
 			})
 
+			Convey("appends proxy host parameter with HTTPS and multiple forwarded protos", func() {
+				r := createSourceRequest("http://mysite.com/forward-this", nil)
+				r.Header["X-Forwarded-Proto"] = []string{"http", "https"}
+
+				req, err := buildRequest(r)
+
+				So(err, ShouldBeNil)
+				So(req.URL.String(), ShouldEqual, "http://target.com/some/prefix/forward-this?proxy-host=https%3A%2F%2Fmysite.com")
+			})
+
 			Convey("forwards headers that are not black-listed", func() {
 				r := createSourceRequest("http://mysite.com/forward-this", map[string]string{
 					"X-Custom":      "some-value",
