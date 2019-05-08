@@ -31,6 +31,7 @@ func newRootHandler(backendURL string, cache httpcache.Cache) http.Handler {
 
 func newDocumentsHandler(backendURL string, cache httpcache.Cache) http.Handler {
 	cachingTransport := httpcache.NewTransport(cache)
+	cachingTransport.Transport = newDocumentTransport(http.DefaultTransport)
 	httpClient := &http.Client{Transport: cachingTransport}
 
 	return newProxy(newRequestBuilder(backendURL, false), httpClient.Do, forwardResponse)

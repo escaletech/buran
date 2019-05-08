@@ -11,8 +11,6 @@ import (
 
 const cacheDuration = 7 * 24 * 60 * 60 // 7 days
 
-type bodyTransformation func(body io.ReadCloser, req *http.Request) (io.ReadCloser, error)
-
 func newRootTransport(inner http.RoundTripper, backendURL string) *rootTransport {
 	return &rootTransport{inner, hostReplacer(backendURL)}
 }
