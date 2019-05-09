@@ -183,10 +183,11 @@ func TestProxy(t *testing.T) {
 				So(req.URL.String(), ShouldEqual, "http://target.com/some/prefix/forward-this?paramOne=foo&second=bar")
 			})
 
-			Convey("forwards all headers", func() {
+			Convey("forwards headers that are not black-listed", func() {
 				r := createSourceRequest("http://mysite.com/forward-this", map[string]string{
-					"X-Custom":      "some-value",
-					"Cache-Control": "no-cache",
+					"X-Custom":        "some-value",
+					"Cache-Control":   "no-cache",
+					"Accept-Encoding": "gzip",
 				})
 
 				req, err := buildRequest(r)

@@ -22,6 +22,10 @@ var rootHeaderBlacklist = map[string]struct{}{
 	"Accept-Encoding": struct{}{},
 }
 
+var documentHeaderBlacklist = map[string]struct{}{
+	"Accept-Encoding": struct{}{},
+}
+
 type requestBuilder func(r *http.Request) (*http.Request, error)
 
 type responseForwarder func(w http.ResponseWriter, res *http.Response) error
@@ -85,14 +89,15 @@ func newRequestBuilder(backendURL string, isAPIRoot bool) requestBuilder {
 			return nil, errors.Wrap(err, "failed to create target request")
 		}
 
+		headerBlackList := documentHeaderBlacklist
 		if isAPIRoot {
-			for k, v := range r.Header {
-				if _, blacklisted := rootHeaderBlacklist[k]; !blacklisted {
-					req.Header[k] = v
-				}
+			headerBlackList = rootHeaderBlacklist
+		}
+
+		for k, v := range r.Header {
+			if _, blacklisted := headerBlackList[k]; !blacklisted {
+				req.Header[k] = v
 			}
-		} else {
-			req.Header = r.Header
 		}
 
 		return req, nil
