@@ -35,7 +35,7 @@ func (t *documentTransport) RoundTrip(req *http.Request) (*http.Response, error)
 	return res, nil
 }
 
-var regex = regexp.MustCompile(`(?m)"url":"http(:[^"]+)"`)
+var regex = regexp.MustCompile(`(?m)"url":"http(:[^"]+.(gif|jpg|jpeg|tiff|png))"`)
 
 func replaceImagesURLProtocol() bodyTransformation {
 	return func(body io.ReadCloser, req *http.Request) (io.ReadCloser, error) {
