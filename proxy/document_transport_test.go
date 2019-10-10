@@ -25,8 +25,22 @@ func TestDocumentTransport(t *testing.T) {
 			body, _ := ioutil.ReadAll(res.Body)
 			So(string(body), ShouldEqual, `"image":{"url":"https://my-fake-image.jpeg"}`)
 		})
-	})
 
+		Convey("returned original body when HTTP protocol is not an image", func() {
+			t := &documentTransport{
+				transport:     roundTripReturningBody(http.StatusOK, `"image":{"url":"http://my-fake-url"}`),
+				transformBody: replaceImagesURLProtocol(),
+			}
+
+			// Act
+			res, err := t.RoundTrip(httptest.NewRequest("GET", "http://target.com", nil))
+
+			// Assert
+			So(err, ShouldBeNil)
+			body, _ := ioutil.ReadAll(res.Body)
+			So(string(body), ShouldEqual, `"image":{"url":"http://my-fake-url"}`)
+		})
+	})
 }
 
 func roundTripReturningBody(statusCode int, body string) http.RoundTripper {

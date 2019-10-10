@@ -96,7 +96,7 @@ $ docker run --name prismic \
 
 ### Requirements
 
-* Go 1.11
+* Go 1.13
 * GNU Make
 
 ### Running
