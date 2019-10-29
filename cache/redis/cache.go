@@ -1,6 +1,11 @@
 package redis
 
-import "github.com/gomodule/redigo/redis"
+import (
+	"strconv"
+
+	"github.com/escaleseo/buran/env"
+	"github.com/gomodule/redigo/redis"
+)
 
 // cache is an implementation of httpcache.Cache that caches responses in a
 // redis server.
@@ -24,8 +29,9 @@ func (c *cache) Get(key string) (resp []byte, ok bool) {
 }
 
 // Set saves a response to the cache as key.
-func (c *cache) Set(key string, resp []byte) {
-	c.conn().Do("SET", cacheKey(key), resp)
+func (c *cache) Set(key string, value []byte) {
+	ttl, _ := strconv.Atoi(env.GetConfig().TTL)
+	c.conn().Do("SET", cacheKey(key), value, "EX", ttl)
 }
 
 // Delete removes the response with key from the cache.
