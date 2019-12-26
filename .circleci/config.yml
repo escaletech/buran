@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  build-and-test:
     docker:
       - image: circleci/golang:1.13
     steps:
@@ -8,15 +8,15 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: 'go test -v ./...'
-      - run: 'make build'
+      - run: "go test -v ./..."
+      - run: "make build"
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
-          paths: [ '/go/pkg/mod' ]
-      - run: 'mkdir -p /tmp/workspace && mv dist /tmp/workspace'
+          paths: ["/go/pkg/mod"]
+      - run: "mkdir -p /tmp/workspace && mv dist /tmp/workspace"
       - persist_to_workspace:
           root: /tmp/workspace
-          paths: [ dist ]
+          paths: [dist]
 
   deploy:
     docker:
@@ -26,20 +26,33 @@ jobs:
       - setup_remote_docker
       - attach_workspace:
           at: /tmp/workspace
-      - run: 'mv /tmp/workspace/dist .'
+      - run: "mv /tmp/workspace/dist ."
       - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
       - run: ./docker_deploy.sh escaletech/buran
 
+ci_only: &ci_only
+  filters:
+    tags:
+      ignore: /.*/
+
+tags_only: &tags_only
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^v.*/
+
 workflows:
   version: 2
-  build-and-deploy:
+  ci:
     jobs:
-      - build
+      - build-and-test:
+          <<: *ci_only
+  release:
+    jobs:
+      - build-and-test:
+          <<: *tags_only
       - deploy:
+          <<: *tags_only
           requires:
-            - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+            - build-and-test
