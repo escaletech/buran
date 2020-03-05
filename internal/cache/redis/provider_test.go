@@ -15,6 +15,7 @@ func TestRedisCacheProvider(t *testing.T) {
 			return &RedisCacheProvider{
 				func() redisCommander { return redis },
 				keyPrefix,
+				10,
 			}, redis
 		}
 

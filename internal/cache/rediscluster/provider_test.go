@@ -17,6 +17,7 @@ func TestRedisClusterCacheProvider(t *testing.T) {
 			return &RedisClusterCacheProvider{
 				cluster,
 				keyPrefix,
+				10 * time.Second,
 			}, cluster
 		}
 

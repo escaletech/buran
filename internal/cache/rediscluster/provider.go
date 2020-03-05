@@ -2,10 +2,12 @@ package rediscluster
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/gregjones/httpcache"
+	"github.com/pkg/errors"
 
 	"github.com/escaleseo/buran/internal/platform/env"
 	"github.com/escaleseo/buran/internal/proxy"
@@ -28,15 +30,22 @@ func New(config env.Config) (*RedisClusterCacheProvider, error) {
 		Addrs: []string{opts.Addr},
 	})
 
+	ttl, err := strconv.Atoi(env.GetConfig().TTL)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid TTL")
+	}
+
 	return &RedisClusterCacheProvider{
 		cluster:    &clusterAdapter{clusterClient},
 		keyPattern: keyPattern(config.BackendURL),
+		ttl:        time.Duration(ttl) * time.Second,
 	}, nil
 }
 
 type RedisClusterCacheProvider struct {
 	cluster    clusterClient
 	keyPattern string
+	ttl        time.Duration
 }
 
 func (p *RedisClusterCacheProvider) Invalidate() error {
@@ -53,7 +62,7 @@ func (p *RedisClusterCacheProvider) Invalidate() error {
 }
 
 func (p *RedisClusterCacheProvider) GetCache() httpcache.Cache {
-	return &cache{p.cluster}
+	return &cache{p.cluster, p.ttl}
 }
 
 func keyPattern(backendURL string) string {

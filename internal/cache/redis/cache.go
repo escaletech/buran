@@ -1,9 +1,6 @@
 package redis
 
 import (
-	"strconv"
-
-	"github.com/escaleseo/buran/internal/platform/env"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -11,6 +8,7 @@ import (
 // redis server.
 type cache struct {
 	conn connectionGetter
+	ttl  int
 }
 
 // cacheKey modifies an httpcache key for use in redis. Specifically, it
@@ -30,8 +28,7 @@ func (c *cache) Get(key string) (resp []byte, ok bool) {
 
 // Set saves a response to the cache as key.
 func (c *cache) Set(key string, value []byte) {
-	ttl, _ := strconv.Atoi(env.GetConfig().TTL)
-	c.conn().Do("SET", cacheKey(key), value, "EX", ttl)
+	c.conn().Do("SET", cacheKey(key), value, "EX", c.ttl)
 }
 
 // Delete removes the response with key from the cache.

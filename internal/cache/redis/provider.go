@@ -3,8 +3,10 @@ package redis
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/escaleseo/buran/internal/proxy"
+	"github.com/pkg/errors"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/gregjones/httpcache"
@@ -26,15 +28,22 @@ func New(config env.Config) (*RedisCacheProvider, error) {
 		},
 	}
 
+	ttl, err := strconv.Atoi(config.TTL)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid ttl")
+	}
+
 	return &RedisCacheProvider{
 		conn:       func() redisCommander { return pool.Get() },
 		keyPattern: keyPattern(config.BackendURL),
+		ttl:        ttl,
 	}, nil
 }
 
 type RedisCacheProvider struct {
 	conn       connectionGetter
 	keyPattern string
+	ttl        int
 }
 
 func (p *RedisCacheProvider) Invalidate() error {
@@ -57,7 +66,7 @@ func (p *RedisCacheProvider) Invalidate() error {
 }
 
 func (p *RedisCacheProvider) GetCache() httpcache.Cache {
-	return &cache{p.conn}
+	return &cache{p.conn, p.ttl}
 }
 
 func keyPattern(backendURL string) string {
