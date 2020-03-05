@@ -3,7 +3,7 @@ package redis
 import (
 	"strconv"
 
-	"github.com/escaleseo/buran/env"
+	"github.com/escaleseo/buran/internal/platform/env"
 	"github.com/gomodule/redigo/redis"
 )
 

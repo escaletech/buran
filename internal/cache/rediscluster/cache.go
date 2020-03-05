@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/escaleseo/buran/env"
+	"github.com/escaleseo/buran/internal/platform/env"
 )
 
 // cache is an implementation of httpcache.Cache that caches responses in a

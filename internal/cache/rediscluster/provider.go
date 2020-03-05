@@ -7,8 +7,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gregjones/httpcache"
 
-	"github.com/escaleseo/buran/env"
-	"github.com/escaleseo/buran/proxy"
+	"github.com/escaleseo/buran/internal/platform/env"
+	"github.com/escaleseo/buran/internal/proxy"
 )
 
 type clusterClient interface {

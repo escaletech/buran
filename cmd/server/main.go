@@ -6,11 +6,11 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
-	"github.com/escaleseo/buran/cache"
-	"github.com/escaleseo/buran/env"
-	"github.com/escaleseo/buran/logger"
-	"github.com/escaleseo/buran/proxy"
-	"github.com/escaleseo/buran/webhook"
+	"github.com/escaleseo/buran/internal/cache"
+	"github.com/escaleseo/buran/internal/platform/env"
+	"github.com/escaleseo/buran/internal/platform/logger"
+	"github.com/escaleseo/buran/internal/proxy"
+	"github.com/escaleseo/buran/internal/webhook"
 )
 
 func main() {
