@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/escaleseo/buran/cache/memory"
 	"github.com/escaleseo/buran/cache/redis"
+	"github.com/escaleseo/buran/cache/rediscluster"
 	"github.com/escaleseo/buran/env"
 	"github.com/gregjones/httpcache"
 	"github.com/pkg/errors"
@@ -20,6 +21,9 @@ func NewProvider(config env.Config) (Provider, error) {
 
 	case "memory":
 		return memory.New()
+
+	case "redis-cluster":
+		return rediscluster.New(config)
 
 	default:
 		return nil, errors.New("unknown cache provider " + config.CacheProvider)
