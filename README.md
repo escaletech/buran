@@ -4,7 +4,7 @@ Lightning-fast proxy cache for Prismic Headless API CMS
 
 ## Table of contents
 
-- [Buran 🚀](#buran-%F0%9F%9A%80)
+- [Buran 🚀](#buran-%f0%9f%9a%80)
   - [Table of contents](#table-of-contents)
   - [Why Buran](#why-buran)
     - [The problem](#the-problem)
@@ -44,12 +44,12 @@ There are two problems here:
 
 Sample measurements from running the script above from different locations (times in milliseconds):
 
-| avg      | min   | max     |                                                                   |
-| -------- | ----- | ------- | ----------------------------------------------------------------- |
-| **10.8** |   8   |  **30** | Call **proxy** from inside Kubernetes **cluster**                 |
-|   20.7   |  16   |    34   | Call **proxy** from GCP instance in **southamerica-east-1**       |
-|   46.3   | **6** |   223   | Call **Prismic CDN** from AWS instance in **us-east-1**           |
-|   86.2   |  20   |   329   | Call **Prismic CDN** from GCP instance in **southamerica-east-1** |
+| avg      | min   | max    |                                                                   |
+| -------- | ----- | ------ | ----------------------------------------------------------------- |
+| **10.8** | 8     | **30** | Call **proxy** from inside Kubernetes **cluster**                 |
+| 20.7     | 16    | 34     | Call **proxy** from GCP instance in **southamerica-east-1**       |
+| 46.3     | **6** | 223    | Call **Prismic CDN** from AWS instance in **us-east-1**           |
+| 86.2     | 20    | 329    | Call **Prismic CDN** from GCP instance in **southamerica-east-1** |
 
 **Note**: the Redis instance used for cache has low network performance, so its latency could also
 be improved.
@@ -75,7 +75,7 @@ Use the following environment variables to configure the server:
 * `PORT` (default: `3000`) - Port on which the application will listen
 * `BACKEND_URL` (*required*, ex: `http://your-repo.cdn.prismic.io`) - URL of your Prismic API backend
 * `REDIS_URL` (default: `redis://localhost`) - Redis connection URL, if you choose to use Redis as a cache
-* `CACHE_PROVIDER` (default: `memory`, values: `redis`, `memory`) - which cache provider implementation to use
+* `CACHE_PROVIDER` (default: `memory`, values: `redis`, `redis-cluster`, `memory`) - which cache provider implementation to use
 
 ### Running in Kubernetes
 

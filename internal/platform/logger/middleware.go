@@ -37,7 +37,7 @@ func (h *middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	latency := time.Since(start)
 	message := fmt.Sprintf("%v %v | %v | %v \"%v\"", r.Method, r.RequestURI, latency, lw.status, http.StatusText(lw.status))
 
-	fields["duration"] = latency / time.Millisecond
+	fields["duration"] = latency / time.Nanosecond
 	fields["from_cache"] = lw.Header().Get("X-From-Cache")
 	httpFields["status_code"] = lw.status
 

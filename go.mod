@@ -1,11 +1,14 @@
 module github.com/escaleseo/buran
 
 require (
+	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gorilla/handlers v1.4.0
 	github.com/gorilla/mux v1.7.0
 	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17
 	github.com/kelseyhightower/envconfig v1.3.0
+	github.com/onsi/ginkgo v1.12.0 // indirect
+	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/rdumont/loki v0.0.0-20180711110410-646a506ec94a
 	github.com/sirupsen/logrus v1.3.0

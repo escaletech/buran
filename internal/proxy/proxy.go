@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/escaleseo/buran/logger"
+	"github.com/escaleseo/buran/internal/platform/logger"
 )
 
 const HostParamKey = "proxy-host"
