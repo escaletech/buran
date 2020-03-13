@@ -15,7 +15,8 @@ import (
 
 type clusterClient interface {
 	Keys(pattern string) *redis.StringSliceCmd
-	Del(keys ...string) *redis.IntCmd
+	DelKeys(pattern string) error
+	Del(key ...string) *redis.IntCmd
 	Get(key string) *redis.StringCmd
 	Set(key string, value interface{}, expiration time.Duration) *redis.StatusCmd
 }
@@ -49,16 +50,7 @@ type RedisClusterCacheProvider struct {
 }
 
 func (p *RedisClusterCacheProvider) Invalidate() error {
-	keys, err := p.cluster.Keys(p.keyPattern).Result()
-	if err != nil {
-		return err
-	}
-
-	if len(keys) > 0 {
-		return p.cluster.Del(keys...).Err()
-	}
-
-	return err
+	return p.cluster.DelKeys(p.keyPattern)
 }
 
 func (p *RedisClusterCacheProvider) GetCache() httpcache.Cache {

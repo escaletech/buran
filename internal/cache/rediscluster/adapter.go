@@ -10,6 +10,22 @@ type clusterAdapter struct {
 	*redis.ClusterClient
 }
 
+func (a *clusterAdapter) DelKeys(pattern string) error {
+	return a.ForEachNode(func(client *redis.Client) error {
+		keys, err := client.Keys(pattern).Result()
+		if err != nil {
+			return err
+		}
+
+		_, err = client.Del(keys...).Result()
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (a *clusterAdapter) Keys(pattern string) *redis.StringSliceCmd {
 	keyMap := map[string]struct{}{}
 	var lock sync.Mutex
