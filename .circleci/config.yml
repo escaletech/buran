@@ -34,11 +34,13 @@ jobs:
     docker:
       - image: golang:1.13-alpine
     steps:
+      - run:
+          name: Install dependencies
+          command: apk add redis bash make git ssh
       - checkout
       - run:
           name: Start Redis Cluster
           command: |
-            apk add redis bash make
             ./scripts/create-cluster start
             echo "yes\n" | ./scripts/create-cluster create
       - restore_cache:
