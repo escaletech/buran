@@ -30,6 +30,52 @@ jobs:
       - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
       - run: ./docker_deploy.sh escaletech/buran
 
+  test-rediscluster:
+    docker:
+      - image: golang:1.13-alpine
+    steps:
+      - checkout
+      - run:
+          name: Start Redis Cluster
+          command: |
+            apk add redis bash make
+            ./scripts/create-cluster start
+            echo "yes\n" | ./scripts/create-cluster create
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make test-rediscluster
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths: ["/go/pkg/mod"]
+
+  test-redis:
+    docker:
+      - image: circleci/golang:1.13
+      - image: circleci/redis
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: make test-redis
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths: ["/go/pkg/mod"]
+
+  test-memory:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: make test-memory
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths: ["/go/pkg/mod"]
+
 ci_only: &ci_only
   filters:
     tags:
@@ -48,11 +94,28 @@ workflows:
     jobs:
       - build-and-test:
           <<: *ci_only
+      - test-memory:
+          <<: *ci_only
+          requires: [build-and-test]
+      - test-redis:
+          <<: *ci_only
+          requires: [build-and-test]
+      - test-rediscluster:
+          <<: *ci_only
+          requires: [build-and-test]
   release:
     jobs:
       - build-and-test:
           <<: *tags_only
+      - test-memory:
+          <<: *tags_only
+          requires: [build-and-test]
+      - test-redis:
+          <<: *tags_only
+          requires: [build-and-test]
+      - test-rediscluster:
+          <<: *tags_only
+          requires: [build-and-test]
       - deploy:
           <<: *tags_only
-          requires:
-            - build-and-test
+          requires: [test-memory, test-redis, test-rediscluster]
