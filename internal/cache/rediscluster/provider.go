@@ -31,7 +31,7 @@ func New(config env.Config) (*RedisClusterCacheProvider, error) {
 		Addrs: []string{opts.Addr},
 	})
 
-	ttl, err := strconv.Atoi(env.GetConfig().TTL)
+	ttl, err := strconv.Atoi(config.TTL)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid TTL")
 	}

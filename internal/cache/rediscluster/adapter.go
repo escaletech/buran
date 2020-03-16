@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/go-redis/redis"
+	"github.com/pkg/errors"
 )
 
 type clusterAdapter struct {
@@ -11,15 +12,28 @@ type clusterAdapter struct {
 }
 
 func (a *clusterAdapter) DelKeys(pattern string) error {
-	return a.ForEachNode(func(client *redis.Client) error {
+	return a.ForEachMaster(func(client *redis.Client) error {
 		keys, err := client.Keys(pattern).Result()
 		if err != nil {
 			return err
 		}
 
-		_, err = client.Del(keys...).Result()
+		if len(keys) == 0 {
+			return nil
+		}
+
+		wg := sync.WaitGroup{}
+		for _, k := range keys {
+			wg.Add(1)
+			go func(k string) {
+				defer wg.Done()
+				err = client.Del(k).Err()
+			}(k)
+		}
+
+		wg.Wait()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "failed to delete keys")
 		}
 
 		return nil
