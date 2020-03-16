@@ -111,5 +111,14 @@ func hostVariationParam(r *http.Request) string {
 			proto = k
 		}
 	}
-	return fmt.Sprintf("?%v=%v", HostParamKey, url.QueryEscape(proto+"://"+r.Host))
+
+	host := r.Header.Get("X-Forwarded-Host")
+	if host == "" {
+		host = r.Header.Get("Host")
+	}
+	if host == "" {
+		host = r.Host
+	}
+
+	return fmt.Sprintf("?%v=%v", HostParamKey, url.QueryEscape(proto+"://"+host))
 }
