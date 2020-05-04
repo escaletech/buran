@@ -13,9 +13,8 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
-      - run: "mkdir -p /tmp/workspace && mv dist /tmp/workspace"
       - persist_to_workspace:
-          root: /tmp/workspace
+          root: .
           paths: [dist]
 
   deploy:
@@ -25,8 +24,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: /tmp/workspace
-      - run: "mv /tmp/workspace/dist ."
+          at: .
       - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
       - run: ./docker_deploy.sh escaletech/buran
 
