@@ -8,14 +8,14 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: "go test -v ./..."
+      - run: make test-unit
       - run: "make build"
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
       - persist_to_workspace:
           root: .
-          paths: [dist]
+          paths: [dist, coverage]
 
   deploy:
     docker:
@@ -30,24 +30,26 @@ jobs:
 
   test-rediscluster:
     docker:
-      - image: golang:1.13-alpine
+      - image: circleci/golang:1.13
     steps:
-      - run:
-          name: Install dependencies
-          command: apk update && apk add redis bash make git openssh
       - checkout
       - run:
           name: Start Redis Cluster
           command: |
+            sudo apt install redis-server
             ./scripts/create-cluster start
             echo "yes\n" | ./scripts/create-cluster create
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make test-rediscluster
+      - run: make test-rediscluster
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
+
 
   test-redis:
     docker:
@@ -62,6 +64,9 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
 
   test-memory:
     docker:
@@ -75,6 +80,30 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
+
+  upload-coverage:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install tools
+          command: |
+            go get github.com/mattn/goveralls
+            go get github.com/wadey/gocovmerge
+      - run:
+          name: Merge coverages
+          command: |
+            gocovmerge ./coverage/unit.out ./coverage/redis.out ./coverage/redis-cluster.out ./coverage/memory.out > ./coverage/all.out
+            sed -i "s/$(pwd | sed 's/\//\\\//g')/github.com\/escaletech\/buran/g" ./coverage/all.out
+      - run:
+          name: Upload coverage
+          command: goveralls -coverprofile=./coverage/all.out -service=circle-ci -repotoken $COVERALLS_TOKEN
 
 ci_only: &ci_only
   filters:
@@ -103,6 +132,9 @@ workflows:
       - test-rediscluster:
           <<: *ci_only
           requires: [build-and-test]
+      - upload-coverage:
+          <<: *ci_only
+          requires: [test-memory, test-redis, test-rediscluster]
   release:
     jobs:
       - build-and-test:
