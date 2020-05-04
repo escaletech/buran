@@ -5,13 +5,13 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/escaleseo/buran/internal/proxy"
+	"github.com/escaletech/buran/internal/proxy"
 	"github.com/pkg/errors"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/gregjones/httpcache"
 
-	"github.com/escaleseo/buran/internal/platform/env"
+	"github.com/escaletech/buran/internal/platform/env"
 )
 
 type redisCommander interface {

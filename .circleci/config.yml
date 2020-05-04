@@ -8,15 +8,14 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: "go test -v ./..."
+      - run: make test-unit
       - run: "make build"
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
-      - run: "mkdir -p /tmp/workspace && mv dist /tmp/workspace"
       - persist_to_workspace:
-          root: /tmp/workspace
-          paths: [dist]
+          root: .
+          paths: [dist, coverage]
 
   deploy:
     docker:
@@ -25,31 +24,32 @@ jobs:
       - checkout
       - setup_remote_docker
       - attach_workspace:
-          at: /tmp/workspace
-      - run: "mv /tmp/workspace/dist ."
+          at: .
       - run: docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
       - run: ./docker_deploy.sh escaletech/buran
 
   test-rediscluster:
     docker:
-      - image: golang:1.13-alpine
+      - image: circleci/golang:1.13
     steps:
-      - run:
-          name: Install dependencies
-          command: apk update && apk add redis bash make git openssh
       - checkout
       - run:
           name: Start Redis Cluster
           command: |
+            sudo apt install redis-server
             ./scripts/create-cluster start
             echo "yes\n" | ./scripts/create-cluster create
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
-      - run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 make test-rediscluster
+      - run: make test-rediscluster
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
+
 
   test-redis:
     docker:
@@ -64,6 +64,9 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
 
   test-memory:
     docker:
@@ -77,47 +80,62 @@ jobs:
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths: ["/go/pkg/mod"]
+      - persist_to_workspace:
+          root: .
+          paths: [coverage]
 
-ci_only: &ci_only
-  filters:
-    tags:
-      ignore: /.*/
-
-tags_only: &tags_only
-  filters:
-    branches:
-      ignore: /.*/
-    tags:
-      only: /^v.*/
+  upload-coverage:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install tools
+          command: |
+            go get github.com/mattn/goveralls
+            go get github.com/wadey/gocovmerge
+      - run:
+          name: Merge coverages
+          command: |
+            gocovmerge ./coverage/unit.out ./coverage/redis.out ./coverage/redis-cluster.out ./coverage/memory.out > ./coverage/all.out
+            sed -i "s/$(pwd | sed 's/\//\\\//g')/github.com\/escaletech\/buran/g" ./coverage/all.out
+      - run:
+          name: Upload coverage
+          command: goveralls -coverprofile=./coverage/all.out -service=circle-ci -repotoken $COVERALLS_TOKEN
 
 workflows:
   version: 2
   ci:
     jobs:
       - build-and-test:
-          <<: *ci_only
+          filters: &ci-filters { tags: { ignore: /.*/ } }
       - test-memory:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
       - test-redis:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
       - test-rediscluster:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
+      - upload-coverage:
+          filters: *ci-filters
+          requires: [test-memory, test-redis, test-rediscluster]
   release:
     jobs:
       - build-and-test:
-          <<: *tags_only
+          filters: &release-filters { branches: { ignore: /.*/ }, tags: { only: /^v.*/ } }
       - test-memory:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - test-redis:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - test-rediscluster:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - deploy:
-          <<: *tags_only
+          filters: *release-filters
           requires: [test-memory, test-redis, test-rediscluster]

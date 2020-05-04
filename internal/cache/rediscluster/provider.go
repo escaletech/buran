@@ -9,8 +9,8 @@ import (
 	"github.com/gregjones/httpcache"
 	"github.com/pkg/errors"
 
-	"github.com/escaleseo/buran/internal/platform/env"
-	"github.com/escaleseo/buran/internal/proxy"
+	"github.com/escaletech/buran/internal/platform/env"
+	"github.com/escaletech/buran/internal/proxy"
 )
 
 type clusterClient interface {
