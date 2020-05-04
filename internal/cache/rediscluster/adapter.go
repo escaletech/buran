@@ -22,12 +22,14 @@ func (a *clusterAdapter) DelKeys(pattern string) error {
 			return nil
 		}
 
-		wg := sync.WaitGroup{}
+		var wg sync.WaitGroup
 		for _, k := range keys {
 			wg.Add(1)
 			go func(k string) {
 				defer wg.Done()
-				err = client.Del(k).Err()
+				if e := client.Del(k).Err(); e != nil {
+					err = e
+				}
 			}(k)
 		}
 
