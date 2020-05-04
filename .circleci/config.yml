@@ -105,49 +105,37 @@ jobs:
           name: Upload coverage
           command: goveralls -coverprofile=./coverage/all.out -service=circle-ci -repotoken $COVERALLS_TOKEN
 
-ci_only: &ci_only
-  filters:
-    tags:
-      ignore: /.*/
-
-tags_only: &tags_only
-  filters:
-    branches:
-      ignore: /.*/
-    tags:
-      only: /^v.*/
-
 workflows:
   version: 2
   ci:
     jobs:
       - build-and-test:
-          <<: *ci_only
+          filters: &ci-filters { tags: { ignore: /.*/ } }
       - test-memory:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
       - test-redis:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
       - test-rediscluster:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [build-and-test]
       - upload-coverage:
-          <<: *ci_only
+          filters: *ci-filters
           requires: [test-memory, test-redis, test-rediscluster]
   release:
     jobs:
       - build-and-test:
-          <<: *tags_only
+          filters: &release-filters { branches: { ignore: /.*/ }, tags: { only: /^v.*/ } }
       - test-memory:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - test-redis:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - test-rediscluster:
-          <<: *tags_only
+          filters: *release-filters
           requires: [build-and-test]
       - deploy:
-          <<: *tags_only
+          filters: *release-filters
           requires: [test-memory, test-redis, test-rediscluster]
