@@ -1,5 +1,12 @@
 # Buran 🚀
 
+[![CircleCI](https://img.shields.io/circleci/build/github/escaletech/buran/master)](https://circleci.com/gh/escaletech/buran)
+[![Coverage status](https://img.shields.io/coveralls/github/escaletech/buran/master)](https://coveralls.io/github/escaletech/buran?branch=master)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/escaletech/buran?sort=semver)](https://hub.docker.com/u/escaletech/buran)
+
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/escaletech/buran?sort=semver)
+[![Go Report Card](https://goreportcard.com/badge/github.com/escaletech/buran)](https://goreportcard.com/report/github.com/escaletech/buran)
+
 Lightning-fast proxy cache for Prismic Headless API CMS
 
 ## Table of contents
