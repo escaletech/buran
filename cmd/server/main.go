@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/escaleseo/buran/cmd/server/handler"
-	"github.com/escaleseo/buran/internal/platform/env"
-	"github.com/escaleseo/buran/internal/platform/logger"
+	"github.com/escaletech/buran/cmd/server/handler"
+	"github.com/escaletech/buran/internal/platform/env"
+	"github.com/escaletech/buran/internal/platform/logger"
 )
 
 func main() {

@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/escaleseo/buran/internal/cache"
-	"github.com/escaleseo/buran/internal/platform/env"
-	"github.com/escaleseo/buran/internal/platform/logger"
-	"github.com/escaleseo/buran/internal/proxy"
-	"github.com/escaleseo/buran/internal/webhook"
+	"github.com/escaletech/buran/internal/cache"
+	"github.com/escaletech/buran/internal/platform/env"
+	"github.com/escaletech/buran/internal/platform/logger"
+	"github.com/escaletech/buran/internal/proxy"
+	"github.com/escaletech/buran/internal/webhook"
 )
 
 func New(config env.Config, log *logrus.Logger) (http.Handler, error) {

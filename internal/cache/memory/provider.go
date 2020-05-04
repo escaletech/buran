@@ -5,7 +5,7 @@ import (
 
 	"github.com/gregjones/httpcache"
 
-	"github.com/escaleseo/buran/internal/proxy"
+	"github.com/escaletech/buran/internal/proxy"
 )
 
 func New() (*MemoryCacheProvider, error) {

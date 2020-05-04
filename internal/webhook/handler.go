@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/escaleseo/buran/internal/cache"
-	"github.com/escaleseo/buran/internal/platform/logger"
+	"github.com/escaletech/buran/internal/cache"
+	"github.com/escaletech/buran/internal/platform/logger"
 )
 
 var log = logger.Get()

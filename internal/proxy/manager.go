@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/escaleseo/buran/internal/platform/env"
+	"github.com/escaletech/buran/internal/platform/env"
 	"github.com/gregjones/httpcache"
 )
 
