@@ -15,7 +15,7 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/smartystreets/assertions v0.0.0-20190116191733-b6c0e53d7304 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/net v0.7.0 // indirect
 	gopkg.in/h2non/gentleman.v2 v2.0.4
 )
 
